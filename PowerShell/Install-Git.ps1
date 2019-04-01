@@ -40,14 +40,14 @@ function Install-LatestGit {
             [string] $DownloadUrl
         )
 
-        Write-Host "Start downloading latest version of Git."
+        Write-Host "[Git] Start downloading latest version of Git."
         Remove-Item -Force $env:TEMP\git-installer.exe -ErrorAction SilentlyContinue
         Invoke-WebRequest -Uri $DownloadUrl -OutFile $env:TEMP\git-installer.exe
-        Write-Host "Download latest version of Git complete" -ForegroundColor Green
+        Write-Host "[Git] Download latest version of Git complete" -ForegroundColor Green
 
-        Write-Host "Installing Git."
+        Write-Host "[Git] Installing Git."
         Start-Process -Wait $env:TEMP\git-installer.exe -ArgumentList /silent
-        Write-Host "Git Installation complete." -ForegroundColor Green
+        Write-Host "[Git] Git Installation complete." -ForegroundColor Green
     }
 
     $LatestGit = Get-LatestGitVersion -sku $sku
@@ -58,7 +58,7 @@ function Install-LatestGit {
 
     $CurrentGitVersion = Get-CurrentGitVersion
     if ($CurrentGitVersion) {
-        Write-Host "Already installed Git, version is $CurrentGitVersion." -ForegroundColor Yellow
+        Write-Host "[Git] Already installed Git, version is $CurrentGitVersion." -ForegroundColor Yellow
 
         if (($LatestGit.Version[0] -gt $CurrentGitVersion[0]) -or
             ($LatestGit.Version[0] -eq $CurrentGitVersion[0] -and
@@ -67,22 +67,22 @@ function Install-LatestGit {
              $LatestGit.Version[1] -eq $CurrentGitVersion[1] -and
              $LatestGit.Version[2] -gt $CurrentGitVersion[2])
         ) {
-            Write-Host "Current Git version is old, newer version is " + $LatestGit.Version + ". Try update Git." -ForegroundColor Yellow
+            Write-Host "[Git] Current Git version is old, newer version is " + $LatestGit.Version + ". Try update Git." -ForegroundColor Yellow
 
-            Write-Host "Check ssh-agent process" -ForegroundColor Yellow
+            Write-Host "[Git] Check ssh-agent process" -ForegroundColor Yellow
             $sshagentrunning = get-process ssh-agent -ErrorAction SilentlyContinue
             if ($sshagentrunning) {
-                Write-Host "Try killing ssh-agent process." -ForegroundColor Yellow
+                Write-Host "[Git] Try killing ssh-agent process." -ForegroundColor Yellow
                 Stop-Process $sshagentrunning.Id
-                Write-Host "Killed ssh-agent process." -ForegroundColor Green
+                Write-Host "[Git] Killed ssh-agent process." -ForegroundColor Green
             }
-            Write-Host "No ssh-agent process still running." -ForegroundColor Green
+            Write-Host "[Git] No ssh-agent process still running." -ForegroundColor Green
             Install-Git -DownloadUrl $LatestGit.DownloadURL
         } else {
-            Write-Host "Already have latest version of Git." -ForegroundColor Green
+            Write-Host "[Git] Already have latest version of Git." -ForegroundColor Green
         }
     } else {
-        Write-Host "Git is not installed." -ForegroundColor Yellow
+        Write-Host "[Git] Git is not installed." -ForegroundColor Yellow
         Install-Git -DownloadUrl $LatestGit.DownloadURL
     }
 }
