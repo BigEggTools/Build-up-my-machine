@@ -10,7 +10,7 @@ Will install the following common used thing to the new Dev Environment:
     * [ ] NodeJS
     * [ ] Python
 * Distributed Version Control System:
-    * [ ] Git
+    * [x] Git
 * IDE:
     * [ ] Visual Studio Code
     * [ ] Visual Studio 2017
