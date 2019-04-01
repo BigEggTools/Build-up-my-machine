@@ -1,17 +1,15 @@
 function Install-LatestGit {
     [CmdletBinding()]
     param (
-        [string] $Sku = "32"
+        [string] $Sku = "64"
     )
 
     function Get-CurrentGitVersion {
-        $gitExePath = "C:\Program Files\Git\bin\git.exe"
-
-        if (!(Test-Path $gitExePath)) {
-            return $null
-        } else {
+        if (Get-Command git -errorAction SilentlyContinue) {
             (git version) -match "(\d*\.\d*\.\d*)" | Out-Null
             return $matches[0].split('.')
+        } else {
+            return $null
         }
     }
 
@@ -43,12 +41,12 @@ function Install-LatestGit {
         )
 
         Write-Host "Start downloading latest version of Git."
-        Remove-Item -Force $env:TEMP\git-installation.exe -ErrorAction SilentlyContinue
-        Invoke-WebRequest -Uri $DownloadUrl -OutFile $env:TEMP\git-installation.exe
+        Remove-Item -Force $env:TEMP\git-installer.exe -ErrorAction SilentlyContinue
+        Invoke-WebRequest -Uri $DownloadUrl -OutFile $env:TEMP\git-installer.exe
         Write-Host "Download latest version of Git complete" -ForegroundColor Green
 
         Write-Host "Installing Git."
-        Start-Process -Wait $env:TEMP\git-installation.exe -ArgumentList /silent
+        Start-Process -Wait $env:TEMP\git-installer.exe -ArgumentList /silent
         Write-Host "Git Installation complete." -ForegroundColor Green
     }
 
