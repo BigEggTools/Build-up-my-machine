@@ -8,7 +8,8 @@ function Install-LatestGit {
         if (Get-Command git -errorAction SilentlyContinue) {
             (git version) -match "(\d*\.\d*\.\d*)" | Out-Null
             return $matches[0].split('.')
-        } else {
+        }
+        else {
             return $null
         }
     }
@@ -66,15 +67,15 @@ function Install-LatestGit {
 
         if (($LatestGit.Version[0] -gt $CurrentGitVersion[0]) -or
             ($LatestGit.Version[0] -eq $CurrentGitVersion[0] -and
-             $LatestGit.Version[1] -gt $CurrentGitVersion[1]) -or
+                $LatestGit.Version[1] -gt $CurrentGitVersion[1]) -or
             ($LatestGit.Version[0] -eq $CurrentGitVersion[0] -and
-             $LatestGit.Version[1] -eq $CurrentGitVersion[1] -and
-             $LatestGit.Version[2] -gt $CurrentGitVersion[2])
+                $LatestGit.Version[1] -eq $CurrentGitVersion[1] -and
+                $LatestGit.Version[2] -gt $CurrentGitVersion[2])
         ) {
             Write-Host ("[Git] Current Git version is old, newer version is $($LatestGit.Version -join '.'). Try update Git.") -ForegroundColor Yellow
 
             Write-Host "[Git] Check ssh-agent process" -ForegroundColor Yellow
-            $sshagentrunning = get-process ssh-agent -ErrorAction SilentlyContinue
+            $sshagentrunning = Get-Process ssh-agent -ErrorAction SilentlyContinue
             if ($sshagentrunning) {
                 Write-Host "[Git] Try killing ssh-agent process." -ForegroundColor Yellow
                 Stop-Process $sshagentrunning.Id
@@ -82,10 +83,12 @@ function Install-LatestGit {
             }
             Write-Host "[Git] No ssh-agent process still running." -ForegroundColor Green
             Install-Git -DownloadUrl $LatestGit.DownloadURL -Version $LatestGit.Version -Sku $Sku
-        } else {
+        }
+        else {
             Write-Host "[Git] Already have latest version of Git." -ForegroundColor Green
         }
-    } else {
+    }
+    else {
         Write-Host "[Git] Git is not installed in this machine." -ForegroundColor Yellow
         Install-Git -DownloadUrl $LatestGit.DownloadURL -Version $LatestGit.Version -Sku $Sku
     }

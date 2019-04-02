@@ -14,7 +14,8 @@ function Install-LatestNodeJS {
         if (Get-Command node -errorAction SilentlyContinue) {
             (node -v) -match "(\d*\.\d*\.\d*)" | Out-Null
             return $matches[0].split('.')
-        } else {
+        }
+        else {
             return $null
         }
     }
@@ -30,7 +31,8 @@ function Install-LatestNodeJS {
                 'Name'    = $latestRelease.name
                 'Version' = $version
             }
-        } else {
+        }
+        else {
             return $null
         }
     }
@@ -64,11 +66,13 @@ function Install-LatestNodeJS {
         if (!$LatestNodeJS) {
             $NotFindNodeJSError = New-Object System.NotSupportedException "Cannot get the inforamtion about latest version of NodeJS."
             throw $NotFindNodeJSError
-        } else {
+        }
+        else {
             Write-Host "[NodeJS] Latest version of NodeJS is $($LatestNodeJS.Version -join '.')"
             $InstallVersion = $LatestNodeJS.Version
         }
-    } else {
+    }
+    else {
         Write-Host "[NodeJS] Want to install NodeJS with version $Version"
         $InstallVersion = $Version.split('.')
     }
@@ -79,17 +83,19 @@ function Install-LatestNodeJS {
 
         if (($InstallVersion[0] -gt $CurrentNodeJSVersion[0]) -or
             ($InstallVersion[0] -eq $CurrentNodeJSVersion[0] -and
-             $InstallVersion[1] -gt $CurrentNodeJSVersion[1]) -or
+                $InstallVersion[1] -gt $CurrentNodeJSVersion[1]) -or
             ($InstallVersion[0] -eq $CurrentNodeJSVersion[0] -and
-             $InstallVersion[1] -eq $CurrentNodeJSVersion[1] -and
-             $InstallVersion[2] -gt $CurrentNodeJSVersion[2])
+                $InstallVersion[1] -eq $CurrentNodeJSVersion[1] -and
+                $InstallVersion[2] -gt $CurrentNodeJSVersion[2])
         ) {
             Write-Host "[NodeJS] Current NodeJS version is old. Try update NodeJS." -ForegroundColor Yellow
             Install-NodeJS -Sku $Sku -Version $InstallVersion
-        } else {
+        }
+        else {
             Write-Host "[NodeJS] Already have a newer version NodeJS installed." -ForegroundColor Green
         }
-    } else {
+    }
+    else {
         Write-Host "[NodeJS] NodeJS is not installed in this machine." -ForegroundColor Yellow
         Install-NodeJS -Sku $Sku -Version $InstallVersion
     }
