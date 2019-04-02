@@ -37,20 +37,24 @@ function Install-LatestGit {
     function Install-Git {
         [CmdletBinding()]
         param (
-            [string] $DownloadUrl
+            [string] $DownloadUrl,
+            [string] $Version,
+            [string] $Sku
         )
 
+        $VersionString = ($Version -join '.')
+
         Write-Host "[Git] Start downloading latest version of Git."
-        Remove-Item -Force $env:TEMP\git-installer.exe -ErrorAction SilentlyContinue
-        Invoke-WebRequest -Uri $DownloadUrl -OutFile $env:TEMP\git-installer.exe
+        Remove-Item -Force $env:TEMP\Git-$VersionString-$Sku-bit.exe -ErrorAction SilentlyContinue
+        Invoke-WebRequest -Uri $DownloadUrl -OutFile $env:TEMP\Git-$VersionString-$Sku-bit.exe
         Write-Host "[Git] Download latest version of Git complete" -ForegroundColor Green
 
         Write-Host "[Git] Installing Git."
-        Start-Process -Wait $env:TEMP\git-installer.exe -ArgumentList /silent
+        Start-Process -Wait $env:TEMP\Git-$VersionString-$Sku-bit.exe -ArgumentList /silent
         Write-Host "[Git] Git Installation complete." -ForegroundColor Green
     }
 
-    $LatestGit = Get-LatestGitVersion -sku $sku
+    $LatestGit = Get-LatestGitVersion -sku $Sku
     if (!$LatestGit) {
         $NotFindGitError = New-Object System.NotSupportedException "Cannot get the inforamtion about latest Git."
         throw $NotFindGitError
@@ -58,7 +62,7 @@ function Install-LatestGit {
 
     $CurrentGitVersion = Get-CurrentGitVersion
     if ($CurrentGitVersion) {
-        Write-Host "[Git] Already installed Git, version is $CurrentGitVersion." -ForegroundColor Yellow
+        Write-Host ("[Git] Already installed Git, version is $($CurrentGitVersion -join '.').") -ForegroundColor Yellow
 
         if (($LatestGit.Version[0] -gt $CurrentGitVersion[0]) -or
             ($LatestGit.Version[0] -eq $CurrentGitVersion[0] -and
@@ -67,7 +71,7 @@ function Install-LatestGit {
              $LatestGit.Version[1] -eq $CurrentGitVersion[1] -and
              $LatestGit.Version[2] -gt $CurrentGitVersion[2])
         ) {
-            Write-Host "[Git] Current Git version is old, newer version is " + $LatestGit.Version + ". Try update Git." -ForegroundColor Yellow
+            Write-Host ("[Git] Current Git version is old, newer version is $($LatestGit.Version -join '.'). Try update Git.") -ForegroundColor Yellow
 
             Write-Host "[Git] Check ssh-agent process" -ForegroundColor Yellow
             $sshagentrunning = get-process ssh-agent -ErrorAction SilentlyContinue
@@ -77,12 +81,12 @@ function Install-LatestGit {
                 Write-Host "[Git] Killed ssh-agent process." -ForegroundColor Green
             }
             Write-Host "[Git] No ssh-agent process still running." -ForegroundColor Green
-            Install-Git -DownloadUrl $LatestGit.DownloadURL
+            Install-Git -DownloadUrl $LatestGit.DownloadURL -Version $LatestGit.Version -Sku $Sku
         } else {
             Write-Host "[Git] Already have latest version of Git." -ForegroundColor Green
         }
     } else {
-        Write-Host "[Git] Git is not installed." -ForegroundColor Yellow
-        Install-Git -DownloadUrl $LatestGit.DownloadURL
+        Write-Host "[Git] Git is not installed in this machine." -ForegroundColor Yellow
+        Install-Git -DownloadUrl $LatestGit.DownloadURL -Version $LatestGit.Version -Sku $Sku
     }
 }
